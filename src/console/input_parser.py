@@ -1,5 +1,3 @@
-from setuptools.tests import textwrap
-
 __author__ = 'Adam'
 
 import argparse
@@ -28,7 +26,7 @@ class Parser(object):  # for new style inheritance
 
     def __create_subparsers_group(self):
         return self.parser.add_subparsers(title="Work mode",
-                                          dest="Mode",
+                                          dest="mode",
                                           description=textwrap.dedent("""\
                                           By default application triggers algorithm.
                                           You can type import flag if you need to create a new database file.
@@ -49,8 +47,20 @@ class Parser(object):  # for new style inheritance
     def __add_data_import_args(self, subparsers):
         import_parser = subparsers.add_parser('import',
                                               help="Import data to the local database")
-        import_parser.add_argument('--path',
+        import_parser.add_argument('path',
                                    help='Path to a CSV file.')
 
     def read_input(self):
-        self.parser.parse_args()
+        args = self.parser.parse_args()
+        if args.mode == 'import':
+            from database.db_import.importer import Importer
+            Importer().import_data(args.path)
+        if args.mode == 'start':
+            print args
+            from workers.worker import Worker
+            Worker(
+                delta=args.delta,
+                loops=args.loops,
+                min_temperature=args.min_temperature,
+                temperature=args.temperature
+            ).work()
