@@ -1,10 +1,41 @@
 1. Algorytm
-	1.2 Parametry
-	.
-	.
-	.
-2. Dane
-	2.1 Baza - sqlite
+	1.1 Parametry:
+		- data dodania tasku
+		- priorytet
+		- co powinno byæ wykonane wczeœniej (drzewo zale¿noœci)
+		- szacowany czas wykonania
+		- szacowany zysk
+	1.2 Funkcjia kosztu - scalanie parametrów - jak po³¹czyæ piorytet z zyskiem w najbardziej optymalny sposób ?
+	1.3 Funkcja celu - kolejnoœæ zadañ powinna byæ przewidziana na miesi¹c do przodu - wa¿ny jest tutaj jak najwiêkszy zysk, przy zachowaniu odpowiednich priorytetów i kolejnoœci wykonañ. dostsosowuj¹c do algorytmu - najwy¿szy zysk wygenerowany w jak najkrótszym czasie - problem? ZnaleŸæ jak najni¿sz¹ temperaturê.
+	1.4 Generacja rozwi¹zania pocz¹tkowego (temperatura pocz¹tkowa) - losowe u³o¿enie zadañ, które maj¹ zostaæ wykonane.
+	1.5 Okreœlenie funkcji prawdopodobieñstwa zmiany rozwi¹zania na gorsze.
+	1.6 Okreœlenie liczby iteracji algorytmu.
 	
-3. Prezentacja wyników
-	3.1 Charty w Matlabie/Excelu czy Pythonie??
+2. Dane
+	2.1 Parametry wejœciowe - baza sqlite
+	2.2 Statystyki kolejnych iteracji algorytmu - pliki .csv 
+		
+3. Prezentacja wyników:
+	3.1 Zak³¹daj¹c, ¿e wyniki znajd¹ siê w plikach CSV analizê mo¿na wykonaæ za pomoc¹ wbudowanej biblioteki csv lub zewnêtrznej - pandas.
+	3.2 Prezentacja wydaje siê najprostsza przy wykorzystaniu biblioteki matplotlib - wymaga dodatkowo numpy (plus pomniejsze wymagane)
+	
+5. Coding:
+	5.1 argparse - przechwycenie parametrów wejœciowych z konsoli (temperatura pocz¹tkowa, temperature koñcowa, liczba iteracji)
+	5.2 sqlite3 - obs³uga bazy danych - zapis i odczyt danych
+	5.3 implementacja skryptu zaczytuj¹cego dane z pliku .txt do bazy
+	5.4 implementacja klasy/funckji odowiedzialnej za prezentacjê statystyk
+	5.5 implemantacja funcji konweruj¹cej czas/prioytet na konkretny parametr - z g³ow¹ :) 
+	5.6 implementacja funcji randomizuj¹cej, w zaleznosci od podanej temperatury 
+
+	
+6. Podzia³ zadañ:
+	24.05	Przemek	5.2
+	24.05	Micha³	5.1
+	24.05	Znalezienie jak najlepszego przyk³¹du w internecie (w dowolnym jêzyku)
+			- przyk³adowy kod mo¿na dodaæ do repo w folderze ./examples/<nazwa_przyk³adu>
+			- by³oby super gdyby w folderze examples zosta³ stworzony pliczek txt z opisem przyk³¹dów (src URL, czemu lepszy, czemu gorszy)
+	
+
+Do poczytania:
+http://www.heatonresearch.com/articles/9 - opis algorytmu wraz z przyk³¹dow¹ implementacj¹ w jêzyku Java
+http://katrinaeg.com/simulated-annealing.html
