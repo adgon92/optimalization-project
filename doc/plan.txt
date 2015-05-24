@@ -1,0 +1,10 @@
+1. Algorytm
+	1.2 Parametry
+	.
+	.
+	.
+2. Dane
+	2.1 Baza - sqlite
+	
+3. Prezentacja wyników
+	3.1 Charty w Matlabie/Excelu czy Pythonie??
