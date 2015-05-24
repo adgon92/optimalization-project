@@ -1,16 +1,19 @@
+from setuptools.tests import textwrap
+
 __author__ = 'Adam'
 
 import argparse
 import textwrap
 
 
+# noinspection PyMethodMayBeStatic
 class Parser(object):  # for new style inheritance
 
     def __init__(self):
         self.parser = argparse.ArgumentParser(
             formatter_class=argparse.RawDescriptionHelpFormatter,
             conflict_handler='resolve',
-            description=textwrap.dedent("""
+            description=textwrap.dedent("""\
             Simulated annealing algorithm.
             Create your own prioritized task-list.
             --------------------------------------
@@ -19,19 +22,35 @@ class Parser(object):  # for new style inheritance
         self.__add_arguments()
 
     def __add_arguments(self):
-        self.__add_core_group()
+        subparsers = self.__create_subparsers_group()
+        self.__add_algorithm_input_args(subparsers)
+        self.__add_data_import_args(subparsers)
 
-    def __add_core_group(self):
-        """
-        Adds mutually exclusive group - we can import txt file into the database or launch the algorithm
-        """
-        core_funcs = self.parser.add_mutually_exclusive_group()
-        core_funcs.add_argument("-s", "--start",
-                                action="store_true",
-                                help="Start algorithm")
-        core_funcs.add_argument("-i", "--import",
-                                action="store_true",
-                                help="Triggers data import")
+    def __create_subparsers_group(self):
+        return self.parser.add_subparsers(title="Work mode",
+                                          dest="Mode",
+                                          description=textwrap.dedent("""\
+                                          By default application triggers algorithm.
+                                          You can type import flag if you need to create a new database file.
+                                          """),
+                                          help="Algorithm mode - start or import")
+
+    def __add_algorithm_input_args(self, subparsers):
+        start_parser = subparsers.add_parser('start',
+                                             help="Triggers algorithm")
+        arguments = [
+            ('-l', '--loops', 'The number of iterations'),
+            ('-t', '--temperature', 'Initial temperature'),
+            ('-d', '--delta', 'Temperature delta'),
+            ('-m', '--min-temperature', 'Minimal temperature')
+        ]
+        map(lambda arg: start_parser.add_argument(arg[0], arg[1], help=arg[2]), arguments)
+
+    def __add_data_import_args(self, subparsers):
+        import_parser = subparsers.add_parser('import',
+                                              help="Import data to the local database")
+        import_parser.add_argument('--path',
+                                   help='Path to a CSV file.')
 
     def read_input(self):
         self.parser.parse_args()
