@@ -8,3 +8,5 @@ import os
 
 DATA_FILE_NAME = 'data.csv'
 DATA_FILE_PATH = os.path.join('..', 'data', DATA_FILE_NAME)
+
+DB_NAME = "Tasks.db"
