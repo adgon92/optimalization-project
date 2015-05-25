@@ -16,64 +16,56 @@ class Database(object):
                 previous_task_2 INTEGER DEFAULT NULL);
                 """
 
-    def connect(self, db_name):
+    def __init__(self):
+        self.cursor = None
+        self.db = None
+
+    def __enter__(self):
         try:
-            sqlite3.connect(db_name)
-        except sqlite3.DatabaseError:
+            self.db = sqlite3.connect(DB_NAME)
+        except sqlite3.DatabaseError as err:
             print "Error. Can't connect to the database."
+            raise err
+        self.cursor = self.db.cursor()
+        return self
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
-    def create_table(self, table_name, sql):
-        with sqlite3.connect(DB_NAME) as db:
-            cursor = db.cursor()
-            cursor.execute('select name from sqlite_master where name=?', (table_name,))
-            result = cursor.fetchall()
+    def drop_table(self, table_name):
+        self.cursor.execute("drop table {0}".format(table_name))
+        self.db.commit()
+
+    def create_table(self, sql):
+            self.cursor.execute('select name from sqlite_master where name=?', (self.table_name,))
+            result = self.cursor.fetchall()
             if len(result) == 1:
                 keep_table = False
-                cursor.execute("drop table if exists {0}".format(table_name))
-                db.commit()
+                self.cursor.execute("drop table if exists {0}".format(self.table_name))
+                self.db.commit()
             else:
                 keep_table = False
             if not keep_table:
-                cursor.execute(sql)
-                db.commit()
-
-    def insert(self):
-        pass
-
-    def drop_table(self, db_name, table_name):
-        with sqlite3.connect(db_name) as db:
-            cursor = db.cursor()
-            cursor.execute("drop table {0}".format(table_name))
-            db.commit()
+                self.cursor.execute(sql)
+                self.db.commit()
 
     def insert(self, values):
         sql = "DELETE FROM Tasks WHERE topic=?"
-        with sqlite3.connect(DB_NAME) as db:
-            cursor = db.cursor()
-            cursor.execute(sql, values)
-            db.commit()
+        self.cursor.execute(sql, values)
+        self.db.commit()
 
     def delete(self, data):
         sql = "DELETE FROM Tasks WHERE topic=?"
-        with sqlite3.connect(DB_NAME) as db:
-            cursor = db.cursor()
-            cursor.execute(sql, (data,))
-            db.commit()
+        self.cursor.execute(sql, (data,))
+        self.db.commit()
 
     def select_all(self):
         sql = "SELECT * FROM Tasks"
-        with sqlite3.connect(DB_NAME) as db:
-            cursor = db.cursor()
-            cursor.execute(sql)
-            products = cursor.fetchall()
-            return products
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
 
     def select_one(self, topic):
         sql = "SELECT * FROM Tasks WHERE topic={}".format(topic)
-        with sqlite3.connect(DB_NAME) as db:
-            cursor = db.cursor()
-            db.text_factory = str
-            cursor.execute(sql)
-            product = cursor.fetchone()
-            return product
+        self.db.text_factory = str
+        self.cursor.execute(sql)
+        return self.cursor.fetchone()
