@@ -8,6 +8,8 @@ class Importer(object):
     def __init__(self):
         pass
 
-    def import_data(self, file_path):
-        with FileProxy(file_path) as proxy:
-            pass
+    def import_data(self):
+        print "Importing data..."
+        with FileProxy() as proxy:
+            proxy.get_json_data()
+

@@ -45,16 +45,14 @@ class Parser(object):  # for new style inheritance
         map(lambda arg: start_parser.add_argument(arg[0], arg[1], help=arg[2]), arguments)
 
     def __add_data_import_args(self, subparsers):
-        import_parser = subparsers.add_parser('import',
-                                              help="Import data to the local database")
-        import_parser.add_argument('path',
-                                   help='Path to a CSV file.')
+        subparsers.add_parser('import',
+                              help="Import data to the local database")
 
     def read_input(self):
         args = self.parser.parse_args()
         if args.mode == 'import':
             from database.db_import.importer import Importer
-            Importer().import_data(args.path)
+            Importer().import_data()
         if args.mode == 'start':
             print args
             from workers.worker import Worker
