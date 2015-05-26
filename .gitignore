@@ -1,3 +1,4 @@
 *.pyc
 src/.idea/
 .idea/
+tools/SQLiteSpy.db3

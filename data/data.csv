@@ -1,4 +1,4 @@
-Temat,Priorytet,Zysk,Czas wykonania,Task poprzedni1,Task poprzedni2
+topic,priority,profit,execution_time,previous_task_1,previous_task_2
 Temat1,2,300,16,,
 Temat2,2,500,12,1,
 Temat3,3,100,8,2,

@@ -19,7 +19,7 @@ class FileProxy(object):
 
     def __exit__(self, ex_type, value, traceback):
         if ex_type is not None:
-            print 'Exception caught: {}\n {}\n      Cause: {}'.format(ex_type, '\n'.join(traceback), value)
+            print 'Exception caught: {}\n {}\n      Cause: {}'.format(ex_type, traceback, value)
         self.file.close()
         print "Data file closed"
 
@@ -41,5 +41,4 @@ class FileProxy(object):
         keys = lines[0]
         result = {line[0]: dict(zip(keys[1:], line[1:])) for line in lines[1:]}
         print 'Converted SUCCESSFULLY'
-        print result
         return result
