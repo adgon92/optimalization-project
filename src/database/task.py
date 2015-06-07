@@ -11,11 +11,16 @@ class Task(object):
             self.execution_time, \
             self.prev_task_1, \
             self.prev_task_2 = args
+        self.punished = False
 
     @property
     def cost(self):
         profit_per_hour = self.profit / self.execution_time
-        return profit_per_hour * self.priority
+        base_cost = profit_per_hour * self.priority
+        return base_cost if not self.punished else base_cost*100
+
+    def punish(self):
+        self.punished = True
 
     def dictify(self):
         return (

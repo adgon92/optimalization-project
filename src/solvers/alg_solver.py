@@ -1,19 +1,39 @@
 __author__ = 'gontarz'
 
 import math
+import copy
 from settings import START_VECTOR
 
 
 class Objective(object):
-    def __init__(self):
-        pass
+    def __init__(self, start_vector):
+        self.max_profit = self._find_max_profit(start_vector)
 
     def get(self, tasks):
         """
         :param tasks: A vector containing tasks in given order
         :type tasks: list
         """
+        c_tasks = copy.deepcopy(tasks)
+        self._check_order(c_tasks)
         return reduce(lambda x, y: x + y, [self._get_obj_cost(task) for task in tasks])
+
+    # noinspection PyMethodMayBeStatic
+    def _find_max_profit(self, tasks):
+        profits = [task.cost for task in tasks]
+        return max(profits)
+
+    def _check_order(self, tasks):
+        for task in tasks[1:]:
+            before = tasks[:tasks.index(tasks)]
+            before_ids = [prev_task.id for prev_task in before]
+            if task.prev_task_1 is not None:
+                if not task.prev_task_1 in before_ids:
+                    task.punish()
+                if task.prev_task_2 is not None:
+                    if not task.prev_task_2 in before_ids:
+                        task.punish()
+
 
     def _get_obj_cost(self, task):
         pass
