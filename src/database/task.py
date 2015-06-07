@@ -15,8 +15,8 @@ class Task(object):
 
     @property
     def cost(self):
-        profit_per_hour = self.profit / self.execution_time
-        base_cost = profit_per_hour * self.priority
+        profit_per_hour = 1.0 / (float(self.profit) / self.execution_time)
+        base_cost = profit_per_hour / self.priority
         return base_cost if not self.punished else base_cost*100
 
     def punish(self):
@@ -37,5 +37,6 @@ class Task(object):
         return self.__repr__()
 
     def __repr__(self):
-        return str((
-        self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2))
+        # return str((
+        # self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2))
+        return str(self.id)

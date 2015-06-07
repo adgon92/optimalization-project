@@ -24,7 +24,6 @@ class mainWindow():
     buttonsframe.columnconfigure(0, weight=1)
     buttonsframe.rowconfigure(0, weight=1)
 
-
     entry1 = StringVar()
     entry2 = StringVar()
     entry3 = StringVar()
@@ -46,11 +45,6 @@ class mainWindow():
     ttk.Button(buttonsframe, text="Start").grid(column=1, row=5, sticky=W)
     ttk.Button(buttonsframe, text="Quit", command=root.quit).grid(column=3, row=5, sticky=W)
 
-
-
-    for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-
-
+    [child.grid_configure(padx=5, pady=5) for child in mainframe.winfo_children()]
 
     root.mainloop()
