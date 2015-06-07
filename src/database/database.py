@@ -60,10 +60,15 @@ class Database(object):
 
     def select_all(self):
         sql = "SELECT * FROM Tasks"
-        self.cursor.execute(sql)
+        self.cursor.execute(sql, ())
         return self.cursor.fetchall()
 
     def select_one(self, topic):
+        """
+        :return: One task described in the following way:
+            (task_id, topic, priority, profit, execution_time, prev_task_1, prev_task_2)
+        :rtype: tuple
+        """
         sql = "SELECT * FROM Tasks WHERE topic=?"
         self.db.text_factory = str
         self.cursor.execute(sql, (topic,))
