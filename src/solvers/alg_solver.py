@@ -16,7 +16,7 @@ class Objective(object):
         """
         c_tasks = copy.deepcopy(tasks)
         self._check_order(c_tasks)
-        return reduce(lambda x, y: x + y, [self._get_obj_cost(task) for task in tasks])
+        return reduce(lambda x, y: x + y, [task.cost for task in c_tasks])
 
     # noinspection PyMethodMayBeStatic
     def _find_max_profit(self, tasks):
@@ -33,10 +33,6 @@ class Objective(object):
                 if task.prev_task_2 is not None:
                     if not task.prev_task_2 in before_ids:
                         task.punish()
-
-
-    def _get_obj_cost(self, task):
-        pass
 
 
 class Solver(object):
@@ -82,4 +78,5 @@ class Solver(object):
 
     def solve(self):
         ini_vector = START_VECTOR
+
 
