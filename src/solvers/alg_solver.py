@@ -38,5 +38,28 @@ class Solver(object):
     FINAL_TEMPERATURE = _to_log(END_WORSE_SOL_ACCEPTANCE)
     REDUCTION_PER_CYCLE = _get_reduction_per_cycle(INITIAL_TEMPERATURE, FINAL_TEMPERATURE, NUMBER_OF_CYCLES)
 
+    def __init__(self, method):
+        self._cooling_method = self.cooling_method(method)
+
+    @property
+    def cooling_method(self):
+        factor = self.FINAL_TEMPERATURE/self.INITIAL_TEMPERATURE
+        boltzmans_const = 1.0/(self.NUMBER_OF_CYCLES-1.0)
+        cooling = {
+            'linear': 1/boltzmans_const,
+            'geometrical': factor**boltzmans_const,
+            'logarithmic': 1/math.log10(boltzmans_const)
+        }
+        return cooling[self._cooling_method]
+
+    @cooling_method.setter
+    def cooling_method(self, method):
+        allowed_values = ('linear', 'geometrical', 'logarithmic')
+        if method not in allowed_values:
+            raise AttributeError('Allowed vales are: {}'.format(allowed_values))
+        self._cooling_method = method
+
+
     def solve(self):
         ini_vector = START_VECTOR
+

@@ -45,15 +45,15 @@ plt.ylabel('x2')
 # Simulated Annealing
 ##################################################
 # Number of cycles
-n = 50
+n = 5000
 # Number of trials per cycle
-m = 50
+m = 10
 # Number of accepted solutions
 na = 0.0
 # Probability of accepting worse solution at the start
-p1 = 0.7
+p1 = 0.6
 # Probability of accepting worse solution at the end
-p50 = 0.001
+p50 = 0.0001
 # Initial temperature
 t1 = -1.0/math.log(p1)
 # Final temperature
