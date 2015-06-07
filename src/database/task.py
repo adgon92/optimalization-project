@@ -19,7 +19,7 @@ class Task(object):
 
     def dictify(self):
         return (
-            self.id, 
+            self.id,
             {
                 "topic": self.topic,
                 "cost": self.cost,
@@ -27,3 +27,10 @@ class Task(object):
                 "prev_task_2": self.prev_task_2
             }
         )
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return str((
+        self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2))

@@ -4,7 +4,7 @@ import sqlite3
 from settings import DB_NAME
 from string import Template
 from copy import copy
-
+from task import Task
 
 class Database(object):
 
@@ -104,3 +104,11 @@ class TopicDatabase(Database):
             print sql
             self.cursor.execute(sql)
             self.db.commit()
+
+    def select_one(self, topic):
+        topic_data = super(TopicDatabase, self).select_one(topic)
+        return Task(topic_data)
+
+    def select_all(self):
+        all_topics = super(TopicDatabase, self).select_all()
+        return [Task(*task_data) for task_data in all_topics]
