@@ -1,6 +1,7 @@
 __author__ = 'gontarz'
 
 import math
+import random
 import copy
 import numpy as np
 from settings import START_VECTOR
@@ -26,15 +27,14 @@ class Objective(object):
         return max(profits)
 
     def _check_order(self, tasks):
-        print(tasks)
         for task in tasks[1:]:
             before = tasks[:tasks.index(task)]
             before_ids = [prev_task.id for prev_task in before]
             if task.prev_task_1 is not None:
                 if not task.prev_task_1 in before_ids:
-                    print('Punishing {}. Cost before: {}'.format(task.topic, task.cost))
+                    # print('Punishing {}. Cost before: {}'.format(task.topic, task.cost))
                     task.punish()
-                    print('     Cost after: {}'.format(task.cost))
+                    # print('     Cost after: {}'.format(task.cost))
                 if task.prev_task_2 is not None:
                     if not task.prev_task_2 in before_ids:
                         task.punish()
@@ -93,7 +93,22 @@ class Solver(object):
         solutions = np.zeros(self.NUMBER_OF_CYCLES + 1)
         solutions[0] = best
         temperature = self.initial_temperature
+        for i in range(self.NUMBER_OF_CYCLES):
+            tasks = self._reorder(tasks)
+            print tasks
+            print self.objective.get(tasks)
 
     def _get_tasks(self, ids):
         with TopicDatabase() as db:
             return [db.select_one('Temat{}'.format(task_id)) for task_id in ids]
+
+    def _reorder(self, tasks):
+        first = second = self._rand_index()
+        while first == second:
+            second = self._rand_index()
+        tasks[first], tasks[second] = tasks[second], tasks[first]
+        return tasks
+
+
+    def _rand_index(self):
+        return random.randint(0, len(START_VECTOR) - 1)
