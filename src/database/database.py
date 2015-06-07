@@ -107,7 +107,7 @@ class TopicDatabase(Database):
 
     def select_one(self, topic):
         topic_data = super(TopicDatabase, self).select_one(topic)
-        return Task(topic_data)
+        return Task(*topic_data)
 
     def select_all(self):
         all_topics = super(TopicDatabase, self).select_all()
