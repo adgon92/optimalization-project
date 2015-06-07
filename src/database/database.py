@@ -10,7 +10,8 @@ class Database(object):
 
     table_name = "Tasks"
     sql = """CREATE TABLE "Tasks"(
-                topic TEXT PRIMARY KEY NOT NULL,
+                id INTEGER PRIMARY KEY NOT null,
+                topic TEXT NOT NULL,
                 priority INTEGER NOT NULL,
                 profit INTEGER NOT NULL,
                 execution_time INTEGER NOT NULL,
@@ -74,8 +75,8 @@ class TopicDatabase(Database):
     def __init__(self):
         super(TopicDatabase, self).__init__()
         self.sql_core_template = Template("""INSERT INTO Tasks VALUES
-            ('$topic', $priority, $profit, $execution_time""")
-        self.core_db_columns = "(topic, priority, profit, execution_time"
+            ($id, '$topic', $priority, $profit, $execution_time""")
+        self.core_db_columns = "(id, topic, priority, profit, execution_time"
 
     def is_topic_defined(self, topic):
         return True if self.select_one(topic) else False
@@ -83,6 +84,7 @@ class TopicDatabase(Database):
     def insert_topic_data(self, topic, **task_params):
         if not self.is_topic_defined(topic):
             task_params["topic"] = topic
+            task_params["id"] = int(topic.replace('Temat', ''))
             sql_core = self.sql_core_template.substitute(task_params)
             columns = copy(self.core_db_columns)
             if task_params["previous_task_1"]:
