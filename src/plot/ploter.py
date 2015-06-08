@@ -3,13 +3,16 @@ __author__ = 'Przemek'
 import numpy as np
 import matplotlib.pyplot as plt
 
-class ploter():
+class Ploter:
 
-    def plot(self, fs):
-        plt.plot(fs,'r.-')
+    def __init__(self):
+        pass
 
-    def save(self):
-        plt.savefig('iterations.png')
+    def plot(self, objectives):
+        plt.plot(objectives,'r.-')
+
+    def save(self, path):
+        plt.savefig(path)
 
     def show(self):
         plt.show()
