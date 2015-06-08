@@ -89,14 +89,46 @@ class Solver(object):
     def solve(self):
         ini_vector = START_VECTOR
         tasks = self._get_tasks(ini_vector)
-        best = self.objective.get(tasks)
-        solutions = np.zeros(self.NUMBER_OF_CYCLES + 1)
-        solutions[0] = best
+        best_objective = self.objective.get(tasks)
+        best_solution = tasks
+        objectives = np.zeros(self.NUMBER_OF_CYCLES + 1)
+        objectives[0] = best_objective
         temperature = self.initial_temperature
+        print 'Initial temperature: {}'.format(temperature)
+        delta_avg = 0.0
+        nof_accepted_solutions = 0.0
         for i in range(self.NUMBER_OF_CYCLES):
-            tasks = self._reorder(tasks)
-            print tasks
-            print self.objective.get(tasks)
+            print 'Cycle: {} with Temperature: {}'.format(i, temperature)
+            for j in range(self.TRIALS_PER_CYCLE):
+                tasks = self._reorder(tasks)
+                current_objective = self.objective.get(tasks)
+                current_delta = abs(current_objective-best_objective)
+                if current_objective > best_objective:  # worse solution case
+                    # Initialize DeltaE_avg if a worse solution was found
+                    #   on the first iteration
+                    if not i and not j:
+                        delta_avg = current_delta
+                    prob_of_acceptance = math.exp(-current_delta/(delta_avg*temperature))
+                    # determine whether to accept worse point
+                    if random.random() < prob_of_acceptance:
+                        accept = True  # accept the worse solution
+                    else:
+                        accept = False  # don't accept the worse solution
+                else:  # objective function is lower, automatically accept
+                    accept = True
+                if accept:  # update currently accepted solution
+                    best_objective = current_objective
+                    best_solution = tasks
+                    nof_accepted_solutions += 1.0
+                    # update DeltaE_avg
+                    delta_avg = (delta_avg * (nof_accepted_solutions - 1.0) + current_delta) / nof_accepted_solutions
+            objectives[i] = self.objective.get(tasks)
+            temperature = self._cool_down(temperature)
+        print(best_objective)
+        print(best_solution)
+
+    def _cool_down(self, temperature):
+        return self.cooling_method * temperature
 
     def _get_tasks(self, ids):
         with TopicDatabase() as db:
