@@ -55,10 +55,9 @@ class Parser(object):  # for new style inheritance
             Importer().import_data()
         if args.mode == 'start':
             print args
-            from workers.worker import Worker
-            Worker(
-                delta=args.delta,
-                loops=args.loops,
-                min_temperature=args.min_temperature,
-                temperature=args.temperature
-            ).work()
+            # Worker(
+            #     delta=args.delta,
+            #     loops=args.loops,
+            #     min_temperature=args.min_temperature,
+            #     temperature=args.temperature
+            # ).work()

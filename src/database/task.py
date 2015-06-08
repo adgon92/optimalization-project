@@ -18,8 +18,9 @@ class Task(object):
     def cost(self):
         profit_per_hour = 1.0 / (float(self.profit) / self.execution_time)
         base_cost = profit_per_hour / self.priority
-        indexed_cost = base_cost * self.index * 2   # doubled index
-        return indexed_cost if not self.punished else indexed_cost*1000
+        indexed_cost = base_cost * self.index * 20   # doubled index
+        indexed_cost = base_cost
+        return indexed_cost if not self.punished else indexed_cost*10000
 
     @property
     def index(self):
@@ -50,6 +51,7 @@ class Task(object):
         return self.__repr__()
 
     def __repr__(self):
-        # return str((
-        # self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2))
-        return str(self.id)
+        return str((
+        self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2)) + '\n'
+        # return str(self.id)
+        # return str(self.id) + ' - ' + str(self.cost) + ' - ' + str()

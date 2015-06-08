@@ -84,6 +84,7 @@ class TopicDatabase(Database):
         self.core_db_columns = "(id, topic, priority, profit, execution_time"
 
     def is_topic_defined(self, topic):
+        print topic
         return True if self.select_one(topic) else False
 
     def insert_topic_data(self, topic, **task_params):
@@ -107,7 +108,7 @@ class TopicDatabase(Database):
 
     def select_one(self, topic):
         topic_data = super(TopicDatabase, self).select_one(topic)
-        return Task(*topic_data)
+        return Task(*topic_data) if topic_data else None
 
     def select_all(self):
         all_topics = super(TopicDatabase, self).select_all()
