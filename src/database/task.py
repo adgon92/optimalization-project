@@ -12,12 +12,25 @@ class Task(object):
             self.prev_task_1, \
             self.prev_task_2 = args
         self.punished = False
+        self._index = 0
 
     @property
     def cost(self):
         profit_per_hour = 1.0 / (float(self.profit) / self.execution_time)
         base_cost = profit_per_hour / self.priority
-        return base_cost if not self.punished else base_cost*100
+        indexed_cost = base_cost * self.index * 2   # doubled index
+        return indexed_cost if not self.punished else indexed_cost*1000
+
+    @property
+    def index(self):
+        return self._index
+
+    @index.setter
+    def index(self, index):
+        if index >= 0:
+            self._index = index + 1
+        else:
+            raise AttributeError('Index has to be greater than zero.')
 
     def punish(self):
         self.punished = True

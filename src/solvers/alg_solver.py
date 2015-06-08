@@ -20,6 +20,7 @@ class Objective(object):
         """
         c_tasks = copy.deepcopy(tasks)
         self._check_order(c_tasks)
+        self._index_tasks(c_tasks)
         return reduce(lambda x, y: x + y, [task.cost for task in c_tasks])
 
     # noinspection PyMethodMayBeStatic
@@ -40,6 +41,10 @@ class Objective(object):
                     if not task.prev_task_2 in before_ids:
                         task.punish()
 
+    def _index_tasks(self, tasks):
+        for task in tasks:
+            task.index = tasks.index(task)
+
 
 class Solver(object):
 
@@ -51,11 +56,10 @@ class Solver(object):
     def _get_reduction_per_cycle(ini_tamp, final_temp, noc):
         return (final_temp/ini_tamp)**(1.0/(noc-1.0))
 
-    NUMBER_OF_CYCLES = 100
-    TRIALS_PER_CYCLE = 100
-    NUMBER_OF_ACCEPTED_SOLUTIONS = 0.0
-    START_WORSE_SOL_ACCEPTANCE = 0.7
-    END_WORSE_SOL_ACCEPTANCE = 0.001
+    NUMBER_OF_CYCLES = 50
+    TRIALS_PER_CYCLE = 10
+    START_WORSE_SOL_ACCEPTANCE = 0.9999
+    END_WORSE_SOL_ACCEPTANCE = 0.003
 
     def __init__(self, method):
         self.initial_temperature = self._to_log(self.START_WORSE_SOL_ACCEPTANCE)
@@ -75,7 +79,7 @@ class Solver(object):
         factor = self.final_temperature/self.initial_temperature
         boltzmans_const = 1.0/(self.NUMBER_OF_CYCLES-1.0)
         cooling = {
-            'linear': 1/boltzmans_const,
+            'linear': 1-self.initial_temperature/(100*self.NUMBER_OF_CYCLES),
             'geometrical': factor**boltzmans_const,
             'logarithmic': 1/math.log10(boltzmans_const)
         }
@@ -85,7 +89,7 @@ class Solver(object):
     def cooling_method(self, method):
         allowed_values = ('linear', 'geometrical', 'logarithmic')
         if method not in allowed_values:
-            raise AttributeError('Allowed vales are: {}'.format(allowed_values))
+            raise AttributeError('Allowed vales are: {}'.format(''.join(allowed_values)))
         self._cooling_method = method
 
     def solve(self):
@@ -136,6 +140,7 @@ class Solver(object):
 
 
     def _cool_down(self, temperature):
+        print self.cooling_method
         return self.cooling_method * temperature
 
     def _get_tasks(self, ids):
