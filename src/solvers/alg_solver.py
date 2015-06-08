@@ -6,6 +6,7 @@ import copy
 import numpy as np
 from settings import START_VECTOR
 from database.database import TopicDatabase
+from plot.ploter import Ploter
 
 
 class Objective(object):
@@ -50,8 +51,8 @@ class Solver(object):
     def _get_reduction_per_cycle(ini_tamp, final_temp, noc):
         return (final_temp/ini_tamp)**(1.0/(noc-1.0))
 
-    NUMBER_OF_CYCLES = 50
-    TRIALS_PER_CYCLE = 50
+    NUMBER_OF_CYCLES = 100
+    TRIALS_PER_CYCLE = 100
     NUMBER_OF_ACCEPTED_SOLUTIONS = 0.0
     START_WORSE_SOL_ACCEPTANCE = 0.7
     END_WORSE_SOL_ACCEPTANCE = 0.001
@@ -67,6 +68,7 @@ class Solver(object):
         self.cooling_method = method
         self.start_tasks = self._get_tasks(START_VECTOR)
         self.objective = Objective(self.start_tasks)
+        self.ploter = Ploter()
 
     @property
     def cooling_method(self):
@@ -122,10 +124,14 @@ class Solver(object):
                     nof_accepted_solutions += 1.0
                     # update DeltaE_avg
                     delta_avg = (delta_avg * (nof_accepted_solutions - 1.0) + current_delta) / nof_accepted_solutions
-            objectives[i] = self.objective.get(tasks)
+            objectives[i] = best_objective
             temperature = self._cool_down(temperature)
         print(best_objective)
         print(best_solution)
+        self.ploter.plot(objectives)
+        self.ploter.show()
+        self.ploter.save('test_plot.png')
+
 
     def _cool_down(self, temperature):
         return self.cooling_method * temperature
