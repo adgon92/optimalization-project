@@ -102,7 +102,9 @@ class Solver(object):
         for i in range(self.NUMBER_OF_CYCLES):
             print 'Cycle: {} with Temperature: {}'.format(i, temperature)
             for j in range(self.TRIALS_PER_CYCLE):
-                tasks = self._reorder(tasks)
+                for k in range(5):
+                    tasks = self._reorder(tasks)
+                #tasks = self._reorder(tasks)
                 current_objective = self.objective.get(tasks)
                 current_delta = abs(current_objective-best_objective)
                 if current_objective > best_objective:  # worse solution case
