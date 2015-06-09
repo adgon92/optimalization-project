@@ -58,9 +58,9 @@ class Solver(object):
     def _get_reduction_per_cycle(ini_tamp, final_temp, noc):
         return (final_temp/ini_tamp)**(1.0/(noc-1.0))
 
-    NUMBER_OF_CYCLES = 5
-    TRIALS_PER_CYCLE = 3000
-    START_WORSE_SOL_ACCEPTANCE = 0.9999
+    NUMBER_OF_CYCLES = 300
+    TRIALS_PER_CYCLE = 100
+    START_WORSE_SOL_ACCEPTANCE = 0.9899
     END_WORSE_SOL_ACCEPTANCE = 0.001
 
     def __init__(self, method):
@@ -142,14 +142,16 @@ class Solver(object):
             objectives[i] = best_objective
             temperature = self._cool_down(temperature, i)
             temperatures[i] = temperature
-        print(best_objective)
-        print(best_solution)
-        self.ploter.plot(objectives, self.cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
+        with open('{}_{}_{}.txt'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE), 'w+') as f:
+            print >> f, best_objective
+            print >> f, best_solution
+        self.ploter.plot(objectives, self._cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
+        self.ploter.save('objectives_{}_{}_{}.png'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE))
         self.ploter.show()
-        self.ploter.save('test_plot.png')
-        self.ploter.plot_temperature(temperatures, self.cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
+        self.ploter.plot_temperature(temperatures, self._cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
+        self.ploter.save('temperatures_{}_{}_{}.png'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE))
         self.ploter.show()
-        self.ploter.save('temperatures.png')
+
 
     def _cool_down(self, temperature, current_cycle):
         return self.cooling_method * temperature if type(self.cooling_method) == float else self.cooling_method(current_cycle)

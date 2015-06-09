@@ -17,10 +17,10 @@ class Task(object):
     @property
     def cost(self):
         profit_per_hour = 1.0 / (float(self.profit) / self.execution_time)
-        base_cost = profit_per_hour / self.priority
+        base_cost = profit_per_hour / self.priority**2
         indexed_cost = base_cost * self.index * 20   # doubled index
         indexed_cost = base_cost
-        return indexed_cost if not self.punished else indexed_cost*10000
+        return indexed_cost if not self.punished else indexed_cost*100000
 
     @property
     def index(self):
