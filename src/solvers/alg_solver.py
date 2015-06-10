@@ -3,8 +3,9 @@ __author__ = 'gontarz'
 import math
 import random
 import copy
+import os
 import numpy as np
-from settings import START_VECTOR
+from settings import START_VECTOR, TXT_DIR_PATH, PLOT_DIR_PATH
 from database.database import TopicDatabase
 from plot.ploter import Ploter
 
@@ -74,7 +75,7 @@ class Solver(object):
         self.cooling_method = method
         self.start_tasks = self._get_tasks(START_VECTOR)
         self.objective = Objective(self.start_tasks)
-        self.ploter = Ploter()
+        self.result = SolvingResult(self)
 
     @property
     def cooling_method(self):
@@ -88,12 +89,20 @@ class Solver(object):
         }
         return cooling[self._cooling_method]
 
+    # noinspection PyAttributeOutsideInit
     @cooling_method.setter
     def cooling_method(self, method):
         allowed_values = ('linear', 'geometrical', 'logarithmic')
         if method not in allowed_values:
             raise AttributeError('Allowed vales are: {}'.format(''.join(allowed_values)))
         self._cooling_method = method
+
+    def get_cooling_method_name(self):
+        return self._cooling_method
+
+    # noinspection PyMethodMayBeStatic
+    def _should_solution_be_accepted(self, prob_of_acceptance):
+        return True if random.random() < prob_of_acceptance else False  # determine whether to accept worse point
 
     def solve(self):
         ini_vector = START_VECTOR
@@ -112,27 +121,17 @@ class Solver(object):
         for i in range(self.NUMBER_OF_CYCLES):
             print 'Cycle: {} with Temperature: {}'.format(i, temperature)
             for j in range(self.TRIALS_PER_CYCLE):
-                # for k in range(5):
-                #     tasks = self._reorder(tasks)
                 tasks = self._reorder(copy.deepcopy(tasks)) if well_ordered is None else self._reorder(copy.deepcopy(well_ordered))
                 current_objective = self.objective.get(tasks)
                 current_delta = abs(current_objective-best_objective)
                 if current_objective > best_objective:  # worse solution case
-                    # Initialize DeltaE_avg if a worse solution was found
-                    #   on the first iteration
-                    if not i and not j:
+                    if not i and not j:  # Initialize DeltaE_avg if a worse solution was found on the first iteration
                         delta_avg = current_delta
                     prob_of_acceptance = math.exp(-current_delta/(delta_avg*temperature))
-                    # determine whether to accept worse point
-                    if random.random() < prob_of_acceptance:
-                        accept = True  # accept the worse solution
-                    else:
-                        accept = False  # don't accept the worse solution
+                    accept = self._should_solution_be_accepted(prob_of_acceptance)
                 else:  # objective function is lower, automatically accept
                     accept = True
                 if accept:  # update currently accepted solution
-                    # print('Cycle: {}, sub: {}, {}'.format(i, j, tasks))
-                    # print('Previous: {}'.format(best_solution))
                     best_objective = current_objective
                     well_ordered = tasks
                     nof_accepted_solutions += 1.0
@@ -142,16 +141,9 @@ class Solver(object):
             objectives[i] = best_objective
             temperature = self._cool_down(temperature, i)
             temperatures[i] = temperature
-        with open('{}_{}_{}.txt'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE), 'w+') as f:
-            print >> f, best_objective
-            print >> f, best_solution
-        self.ploter.plot(objectives, self._cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
-        self.ploter.save('objectives_{}_{}_{}.png'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE))
-        self.ploter.show()
-        self.ploter.plot_temperature(temperatures, self._cooling_method, self.initial_temperature, self.NUMBER_OF_CYCLES)
-        self.ploter.save('temperatures_{}_{}_{}.png'.format(self._cooling_method, self.NUMBER_OF_CYCLES, self.TRIALS_PER_CYCLE))
-        self.ploter.show()
 
+        self.result.save_output(best_objective, best_solution)
+        self.result.plot(objectives, temperatures)
 
     def _cool_down(self, temperature, current_cycle):
         return self.cooling_method * temperature if type(self.cooling_method) == float else self.cooling_method(current_cycle)
@@ -167,6 +159,54 @@ class Solver(object):
         tasks[first], tasks[second] = tasks[second], tasks[first]
         return tasks
 
-
     def _rand_index(self):
         return random.randint(0, len(START_VECTOR) - 1)
+
+
+class SolvingResult(object):
+    def __init__(self, parent):
+        """
+        :param parent:
+        :type parent: Solver
+        """
+        self.parent = parent
+        self.ploter = Ploter()
+
+    def plot(self, objectives, temperatures):
+        self.ploter.plot(
+            objectives,
+            self.parent.get_cooling_method_name(),
+            self.parent.initial_temperature,
+            self.parent.NUMBER_OF_CYCLES
+        )
+        self.ploter.save(self._get_objectives_path())
+        self.ploter.show()
+
+        self.ploter.plot_temperature(
+            temperatures,
+            self.parent.get_cooling_method_name(),
+            self.parent.initial_temperature,
+            self.parent.NUMBER_OF_CYCLES
+        )
+        self.ploter.save(self._get_temperature_path())
+        self.ploter.show()
+
+    def save_output(self, objective, solution):
+        with open(self._get_txt_path(), 'w+') as f:
+            print >> f, objective
+            print >> f, solution
+
+    def _get_txt_path(self):
+        file_name = '{}_{}_{}.txt'.format(*self._get_basic_parents_params())
+        return os.path.join(TXT_DIR_PATH, file_name)
+
+    def _get_objectives_path(self):
+        file_name = 'objectives_{}_{}_{}.png'.format(*self._get_basic_parents_params())
+        return os.path.join(PLOT_DIR_PATH, file_name)
+
+    def _get_temperature_path(self):
+        file_name = 'temperature_{}_{}_{}.png'.format(*self._get_basic_parents_params())
+        return os.path.join(PLOT_DIR_PATH, file_name)
+
+    def _get_basic_parents_params(self):
+        return self.parent.get_cooling_method_name(), self.parent.NUMBER_OF_CYCLES, self.parent.TRIALS_PER_CYCLE
