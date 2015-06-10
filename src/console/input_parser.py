@@ -2,6 +2,8 @@ __author__ = 'Adam'
 
 import argparse
 import textwrap
+import settings
+from solvers.alg_solver import Solver
 
 
 # noinspection PyMethodMayBeStatic
@@ -37,10 +39,14 @@ class Parser(object):  # for new style inheritance
         start_parser = subparsers.add_parser('start',
                                              help="Triggers algorithm")
         arguments = [
-            ('-l', '--loops', 'The number of iterations'),
-            ('-t', '--temperature', 'Initial temperature'),
-            ('-d', '--delta', 'Temperature delta'),
-            ('-m', '--min-temperature', 'Minimal temperature')
+            ('-m', '--cooling-method', 'Cooling method. Possible methods: linear and geometrical'),
+            ('-c', '--cycles', 'Number of cycles'),
+            ('-t', '--trials', 'Number of trials per cycle'),
+            ('-s', '--start-acceptance', 'Start worse solution acceptance'),
+            ('-e', '--end-acceptance', 'End worse solution acceptance'),
+            ('-o', '--order-importance', 'Tasks order importance factor'),
+            ('-p', '--priority-importance', 'Tasks priority importance factor'),
+
         ]
         map(lambda arg: start_parser.add_argument(arg[0], arg[1], help=arg[2]), arguments)
 
@@ -54,10 +60,7 @@ class Parser(object):  # for new style inheritance
             from database.db_import.importer import Importer
             Importer().import_data()
         if args.mode == 'start':
-            print args
-            # Worker(
-            #     delta=args.delta,
-            #     loops=args.loops,
-            #     min_temperature=args.min_temperature,
-            #     temperature=args.temperature
-            # ).work()
+            settings.ORDER_IMPORTANCE = int(args.order_importance)
+            settings.PRIORITY_IMPORTANCE = int(args.priority_importance)
+            solver = Solver(**vars(args))
+            solver.solve()

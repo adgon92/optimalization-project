@@ -21,6 +21,10 @@ PLOT_DIR_PATH = os.path.join('.', 'plot', 'png')
 START_VECTOR = [27, 41, 39, 8, 30, 23, 38, 14, 29, 50, 1, 22, 2, 19, 13, 24, 35, 11, 48, 20, 6, 44, 15, 18, 42, 21, 36,
                 7, 4, 49, 3, 17, 45, 28, 31, 33, 40, 25, 26, 12, 16, 37, 34, 32, 10, 9, 43, 46, 47, 5]
 
+# Default Task settings (may be overridden by cmd-line)
+ORDER_IMPORTANCE = 20
+PRIORITY_IMPORTANCE = 2
+
 
 def shuffle():  # call only once and save the result!
     x = [i for i in range(50)]

@@ -1,5 +1,7 @@
 __author__ = 'gontarz'
 
+from settings import ORDER_IMPORTANCE, PRIORITY_IMPORTANCE
+
 
 class Task(object):
 
@@ -17,8 +19,8 @@ class Task(object):
     @property
     def cost(self):
         profit_per_hour = 1.0 / (float(self.profit) / self.execution_time)
-        base_cost = profit_per_hour / self.priority**2
-        indexed_cost = base_cost * self.index * 20   # doubled index
+        base_cost = profit_per_hour / self.priority**PRIORITY_IMPORTANCE
+        indexed_cost = base_cost * self.index*ORDER_IMPORTANCE
         indexed_cost = base_cost
         return indexed_cost if not self.punished else indexed_cost*100000
 
@@ -52,6 +54,4 @@ class Task(object):
 
     def __repr__(self):
         return str((
-        self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2)) + '\n'
-        # return str(self.id)
-        # return str(self.id) + ' - ' + str(self.cost) + ' - ' + str()
+            self.id, self.topic, self.priority, self.profit, self.execution_time, self.prev_task_1, self.prev_task_2)) + '\n'

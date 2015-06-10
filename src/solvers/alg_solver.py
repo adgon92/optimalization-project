@@ -59,12 +59,18 @@ class Solver(object):
     def _get_reduction_per_cycle(ini_tamp, final_temp, noc):
         return (final_temp/ini_tamp)**(1.0/(noc-1.0))
 
-    NUMBER_OF_CYCLES = 300
-    TRIALS_PER_CYCLE = 100
-    START_WORSE_SOL_ACCEPTANCE = 0.9899
-    END_WORSE_SOL_ACCEPTANCE = 0.001
+    # --->>> LEGACY <<<---
+    # NUMBER_OF_CYCLES = 300
+    # TRIALS_PER_CYCLE = 100
+    # START_WORSE_SOL_ACCEPTANCE = 0.9899
+    # END_WORSE_SOL_ACCEPTANCE = 0.001
+    # ---
 
-    def __init__(self, method):
+    def __init__(self, **kwargs):
+        self.NUMBER_OF_CYCLES = int(kwargs["cycles"])
+        self.TRIALS_PER_CYCLE = int(kwargs["trials"])
+        self.START_WORSE_SOL_ACCEPTANCE = float(kwargs["start_acceptance"])
+        self.END_WORSE_SOL_ACCEPTANCE = float(kwargs["end_acceptance"])
         self.initial_temperature = self._to_log(self.START_WORSE_SOL_ACCEPTANCE)
         self.final_temperature = self._to_log(self.END_WORSE_SOL_ACCEPTANCE)
         self.reduction_per_cycle = self._get_reduction_per_cycle(
@@ -72,7 +78,7 @@ class Solver(object):
             self.final_temperature,
             self.NUMBER_OF_CYCLES
         )
-        self.cooling_method = method
+        self.cooling_method = kwargs["cooling_method"]
         self.start_tasks = self._get_tasks(START_VECTOR)
         self.objective = Objective(self.start_tasks)
         self.result = SolvingResult(self)
@@ -85,14 +91,14 @@ class Solver(object):
             'linear': lambda
                 current_cycle: self.initial_temperature - self.initial_temperature / self.NUMBER_OF_CYCLES * current_cycle,
             'geometrical': factor**boltzmans_const,
-            'logarithmic': 1/math.log(boltzmans_const)
+            # 'logarithmic': 1/math.log(boltzmans_const)
         }
         return cooling[self._cooling_method]
 
     # noinspection PyAttributeOutsideInit
     @cooling_method.setter
     def cooling_method(self, method):
-        allowed_values = ('linear', 'geometrical', 'logarithmic')
+        allowed_values = ('linear', 'geometrical')  # 'logarithmic'
         if method not in allowed_values:
             raise AttributeError('Allowed vales are: {}'.format(''.join(allowed_values)))
         self._cooling_method = method
